@@ -1,0 +1,32 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    height: calc(100vh - 56px);     /* Substract the navbar height */
+}
+
+#note-area {
+    display: flex;
+    flex-direction: column;
+    height: 100%;                   /* To take up whole main container height */
+    gap: 10px;
+}
+
+#note-title {
+    font-size: 1.5rem;
+}
+
+#note-content {
+    flex-grow: 1;                   /* Textarea takes up remaining #note-area */
+    resize: none;
+}
+
+/* Testing Purposes */
+.border-red{
+    border: 3px solid red;
+}

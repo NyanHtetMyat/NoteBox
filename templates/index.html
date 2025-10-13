@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Homepage
+{% endblock %}
+
+
+{% block body %}
+
+<div class="row flex-nowrap h-100 w-100">
+  <!-- Left sidebar -->
+  <aside class="col-12 col-md-3 col-lg-2 bg-light border-end border-secondary overflow-auto">
+    <h5 class="p-3 text-center">My Notes</h5>
+    <button class="btn btn-outline-secondary w-100 text-start mb-2">Create New Note</button>
+    <div id="noteList">
+      {% for i in range(15) %}
+      <button class="btn btn-outline-secondary w-100 text-start mb-2">Note {{ i+1 }}</button>
+      {% endfor %}
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <section class="col-12 col-md-9 col-lg-10 p-4">
+    <form id="note-area" action="/index">
+
+        <input class="form-control form-control-lg border border-secondary" id="note-title" placeholder="Enter Note Title" type="text">
+
+        <textarea class="form-control border border-secondary" id="note-content"></textarea>
+
+        <div>
+          <button class="btn btn-success" type="button" name="save"> Save </button>
+          <button class="btn btn-danger" type="button" name="delete"> Delete </button>
+        </div>
+
+    </form>
+  </section>
+</div>
+
+{% endblock %}
