@@ -6,21 +6,42 @@
 
 
 {% block body %}
+<!-- Sidebar Toggler Button -->
+<div class="d-block d-md-none bg-secondary w-100">
+  <button class="btn py-0 px-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#collapisble-sidebar">
+      <svg xmlns="http://www.w3.org/2000/svg" height="36px" viewBox="0 -960 960 960" width="36px" fill="#e8eaed"><path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/></svg>
+  </button>
+</div>
+
+<!-- Collapisble Sidebar -->
+<aside class="offcanvas offcanvas-start" id="collapisble-sidebar">
+  <div class="offcanvas-header py-2 bg-dark text-white">
+    <h1 class="offcanvas-title">My Notes</h1>
+    <button type="button" class="btn-close btn-close-white text-reset" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body">
+    <button class="btn btn-outline-secondary w-100 text-start mb-3">Create New Note</button>
+    {% for i in range(10) %}
+    <button class="btn btn-outline-secondary w-100 text-start mb-3">Note {{ i+1 }}</button>
+    {% endfor %}
+  </div>
+</aside>
+
 
 <div class="row flex-nowrap h-100 w-100">
   <!-- Left sidebar -->
-  <aside class="col-12 col-md-3 col-lg-2 bg-light border-end border-secondary overflow-auto">
-    <h5 class="p-3 text-center">My Notes</h5>
-    <button class="btn btn-outline-secondary w-100 text-start mb-2">Create New Note</button>
-    <div id="noteList">
-      {% for i in range(15) %}
-      <button class="btn btn-outline-secondary w-100 text-start mb-2">Note {{ i+1 }}</button>
+  <aside class="d-none d-md-block col-md-3 col-lg-2 bg-light border-end border-secondary overflow-auto">
+    <h3 class="p-3 text-center border-bottom border-secondary">My Notes</h3>
+    <button class="btn btn-outline-secondary w-100 text-start my-3">Create New Note</button>
+    <div>
+      {% for i in range(10) %}
+      <button class="btn btn-outline-secondary w-100 text-start mb-3">Note {{ i+1 }}</button>
       {% endfor %}
     </div>
   </aside>
 
   <!-- Main content -->
-  <section class="col-12 col-md-9 col-lg-10 p-4">
+  <section class="col-md-9 col-lg-10 p-4">
     <form id="note-area" action="/index">
 
         <input class="form-control form-control-lg border border-secondary" id="note-title" placeholder="Enter Note Title" type="text">
@@ -34,6 +55,7 @@
 
     </form>
   </section>
+
 </div>
 
 {% endblock %}

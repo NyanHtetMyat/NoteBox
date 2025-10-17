@@ -10,11 +10,15 @@ main {
     height: calc(100vh - 56px);     /* Substract the navbar height */
 }
 
+#collapisble-sidebar {
+    width: 300px !important;        /* Default is 400px */
+}
+
 #note-area {
     display: flex;
     flex-direction: column;
     height: 100%;                   /* To take up whole main container height */
-    gap: 10px;
+    gap: 15px;
 }
 
 #note-title {
@@ -26,7 +30,15 @@ main {
     resize: none;
 }
 
+/* For Smaller Screens */
+@media (max-width: 768px) {
+
+
+
+}
+
+
 /* Testing Purposes */
-.border-red{
-    border: 3px solid red;
+.border-red {
+    border: 1px solid red;
 }
