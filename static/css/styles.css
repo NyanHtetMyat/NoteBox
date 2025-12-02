@@ -30,11 +30,12 @@ main {
     resize: none;
 }
 
-/* For Smaller Screens */
-@media (max-width: 768px) {
+#note-area-footer {
+    gap: 1.5rem;                    /* Distance between "Save" and "Delete" buttons */
+}
 
-
-
+#note-area-footer button {
+    width: 100px;                   /* "Save" and "Delete" buttons width */
 }
 
 

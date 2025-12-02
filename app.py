@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import Flask, flash, redirect, render_template, request, session, jsonify
 from flask_session import Session
 from flask import g
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -53,15 +53,19 @@ def after_request(response):
 @login_required
 def index():
     """ User Dashboard """
-    return render_template("index.html")
 
+    try:
+        # Setup Database Connection
+        db = get_db()
 
-@app.route("/admin")
-@login_required
-@admin_only
-def admin():
-    """ Admin Dashboard """
-    return render_template("admin.html")
+        # Query Note IDs and Titles only
+        user_notes = db.execute("SELECT id, title FROM notes WHERE user_id = ? ORDER BY updated_at DESC", 
+            (session["user_id"],)).fetchall()
+
+    except Exception as e:
+        return str(e), 403
+
+    return render_template("index.html", user_notes=user_notes)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -172,6 +176,120 @@ def register():
         return render_template("register.html")
 
 
-@app.route("/test")
-def test():
-    return render_template("test.html")
+@app.route("/get_note_content")
+@login_required
+def get_note_content():
+    """ To get user note contents """
+
+    try:
+        # Set up database connection
+        db = get_db()
+
+        # Get note id
+        note_id = request.args.get("id").strip()
+
+        # Check for missing ID
+        if not note_id:
+            raise Exception("Missing Note ID")
+
+        # Get a single dict of Note Content and Last Updated Date ("user_id" is for checking Authentication)
+        row_note_details = db.execute("SELECT title, content, updated_at FROM notes WHERE id = ? AND user_id = ?",
+            (note_id, session["user_id"],)).fetchone()
+
+        # Check if note exists
+        if not row_note_details:
+            raise Exception("Note Does not exist")
+
+        # Change to actual Dict
+        note_details = dict(row_note_details)
+
+        return jsonify(note_details)
+    
+    except Exception as e:
+        return str(e), 403
+
+
+@app.route("/save_note", methods=["GET", "POST"])
+@login_required
+def save_note():
+    """ To save a note """
+
+    try:
+        # Set up database connection
+        db = get_db()
+
+        # Get JSON string from JS
+        note_details = request.get_json()
+
+        # Check for empty JSON
+        if not note_details:
+            raise Exception("Empty JSON detected!")
+
+
+        note_id = note_details.get("id", None)
+        note_title = note_details.get("title", None)
+        note_content = note_details.get("content", None)
+
+        # Check for empty note
+        if not (note_title or note_content):
+            raise Exception("Empty note title or content detected!")
+
+        # This block is for inserting new notes
+        if not note_id:
+            # Cursor is for reading meta data.
+            cursor = db.execute("INSERT INTO notes (user_id, title, content) VALUES (?, ?, ?)",
+                (session["user_id"], note_title, note_content,))
+
+            db.commit()
+
+            # Get New Note's title and Last Updated values
+            new_note_details = db.execute("SELECT id, title, updated_at FROM notes WHERE id=?",
+                (cursor.lastrowid,)).fetchone()
+
+            # Change the result to actual dict and returns json string
+            return jsonify(dict(new_note_details))
+            
+
+        # This block is for updating old notes
+        else:
+            db.execute("UPDATE notes SET title=?, content=? WHERE id=? AND user_id=?",
+                (note_title, note_content, note_id, session["user_id"],))
+
+            db.commit()
+
+            # Get Edited Note's title and Last Updated values
+            note_details = db.execute("SELECT id, title, updated_at FROM notes WHERE id = ?",
+                (note_id,)).fetchone()
+
+            return jsonify(dict(note_details))
+    
+    except Exception as e:
+        db.rollback()
+        return str(e), 403
+
+
+@app.route("/del_note")
+@login_required
+def del_note():
+    """ To delete a user note"""
+
+    try:
+        # Set up database connection
+        db = get_db()
+
+        # Get note id
+        note_id = request.args.get("id").strip()
+
+        # Check for missing ID
+        if not note_id:
+            raise Exception("Missing Note ID")
+
+        # Delete row
+        db.execute("DELETE FROM notes WHERE id = ? AND user_id = ?", 
+            (note_id, session["user_id"]))
+
+        db.commit()
+
+    except Exception as e:
+        db.rollback()
+        return str(e), 403
