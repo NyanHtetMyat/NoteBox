@@ -4,10 +4,12 @@ body {
     height: 100vh;
     display: flex;
     flex-direction: column;
+
+    background-color: rgb(221, 221, 221);
 }
 
 main {
-    height: calc(100vh - 56px);     /* Substract the navbar height */
+    height: calc(100vh - 68px);     /* Substract the navbar height */
 }
 
 #collapisble-sidebar {
@@ -36,6 +38,12 @@ main {
 
 #note-area-footer button {
     width: 100px;                   /* "Save" and "Delete" buttons width */
+}
+
+.logo {
+    font-family: sans-serif;
+    font-size: 28px;
+    font-weight: 600;
 }
 
 

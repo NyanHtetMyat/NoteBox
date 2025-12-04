@@ -1,0 +1,251 @@
+document.addEventListener('DOMContentLoaded', function () {
+
+  // To Decide Insert or Update to "notes" table
+  let current_note_id = null;
+
+  // Assign Note Elements, Save, Delete buttons to Variables to reuse later
+  const note_title_element = document.getElementById("note-title");
+  const note_content_element = document.getElementById("note-content");
+  const note_last_updated_element = document.getElementById("note-last-updated");
+  const note_save_element = document.getElementById("btn-note-save");
+  const note_delete_element = document.getElementById("btn-note-delete");
+
+  const noteForm = document.getElementById("note-area");
+
+  const note_create_element = document.querySelectorAll(".btn-note-create");
+
+
+  /* === HELPER FUNCTIONs === */
+  function get_note_btn_elements() {
+    return document.querySelectorAll(".btn-note");
+  }
+
+  function reset_note() {
+    note_title_element.value = "";
+    note_content_element.value = "";
+    note_last_updated_element.textContent = "None";
+  }
+
+  function setActiveNote(note_id) {
+    if (!note_id) {
+      // New note clicked
+      note_create_element.forEach(el => el.classList.add("active"));
+      get_note_btn_elements().forEach(btn => btn.classList.remove("active"));
+    } else {
+      // Existing note clicked
+      note_create_element.forEach(el => el.classList.remove("active"));
+      get_note_btn_elements().forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.id == note_id);
+      });
+    }
+  }
+
+  function updateNoteList(id, title=null) {
+    // Select ALL note lists (mobile + desktop)
+    const lists = document.querySelectorAll(".note-button-list");
+
+    // Case 1 and 2: Deleting/Updating Old Notes
+    const existingButtons = document.querySelectorAll(`.btn-note[data-id='${id}']`);
+
+    if (existingButtons.length > 0) 
+    {
+      // Case: 1 Deleting Old Notes
+      if (title === null)
+      {
+        existingButtons.forEach(btn => btn.remove());    // I had to use for-each since I have two lists
+        return;
+      }
+
+      // Case 2: Updating Old Notes' titles
+      else 
+      {
+        existingButtons.forEach(btn => btn.textContent = title);
+
+        // Move these buttons to the top inside each list
+        lists.forEach(list => {
+          const btn = list.querySelector(`.btn-note[data-id='${id}']`);
+          list.prepend(btn);
+        });
+
+        return;
+      }
+    }
+
+    // Case 3: New note creation
+    const html = `
+        <button class="btn-note btn btn-outline-secondary w-100 text-start mb-3"
+                data-id="${id}">
+          ${title}
+        </button>
+    `;
+
+    // Insert into both note lists (mobile + desktop)
+    lists.forEach(list => {
+      list.insertAdjacentHTML("afterbegin", html);
+    });
+  }
+
+  function updateSaveBtn() {
+    const note_title = note_title_element.value.trim();
+    const note_content = note_content_element.value.trim();
+
+    // Disable the save button when an empty field is detected.
+    note_save_element.disabled = (!note_title || !note_content);
+  }
+
+  function updateDelBtn() {
+    if (!current_note_id)
+    {
+      note_delete_element.classList.remove("active");
+      note_delete_element.classList.add("disabled");
+    }
+    else 
+    {
+      note_delete_element.classList.add("active");
+      note_delete_element.classList.remove("disabled");
+    }
+  }
+
+  // === EXECUTE ABOVE HELPER FUNCTONS ONCE
+  updateSaveBtn();
+  updateDelBtn();
+  setActiveNote();
+
+
+  /* === EVENT LISTENERS === */
+
+  note_title_element.addEventListener("input", updateSaveBtn);
+  note_content_element.addEventListener("input", updateSaveBtn);
+
+
+  // *** TO PREVENT ACCIDENTAL FORM SUBMIT
+  noteForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+  });
+
+
+  // *** THIS IS FOR CREATING NEW NOTES
+  document.querySelectorAll(".btn-note-create").forEach(note_create_btn => {
+    note_create_btn.addEventListener("click", () => {
+
+      try {
+        // This is note creating mode.
+        current_note_id = null;
+
+        // Highlight Current Button
+        setActiveNote(current_note_id);
+
+        // Empty note details from HTML Elements.
+        reset_note();
+
+        updateSaveBtn();
+        updateDelBtn();
+      }
+      catch (e) {
+        alert("Error! Details: " + e);
+      }
+
+    });
+  });
+
+
+
+  // *** THIS IS FOR SELECTING PRE-EXISTING NOTES.
+  document.addEventListener("click", async (e) => {
+    // Handle all clicks on .btn-note elements
+    if (e.target.classList.contains("btn-note")) {
+      const note_btn = e.target;
+
+      try {
+        // Note editing mode
+        current_note_id = note_btn.dataset.id;
+
+        // Highlight current note button
+        setActiveNote(note_btn.dataset.id);
+
+        const response = await fetch(`/get_note_content?id=${current_note_id}`);
+        const note_details = await response.json();
+
+        // Fill form
+        note_title_element.value = note_details.title;
+        note_content_element.value = note_details.content;
+        note_last_updated_element.textContent = note_details.updated_at;
+
+        updateSaveBtn();
+        updateDelBtn();
+      } 
+      catch (e) {
+        alert("Error! Details: " + e);
+      }
+    }
+  });
+
+
+  // *** THIS IS FOR Button - Save
+  note_save_element.addEventListener("click", async () => {
+
+    // Prepare for sending json to backend
+    const id = current_note_id;
+    const title = note_title_element.value.trim();
+    const content = note_content_element.value.trim();
+
+    // Check for empty note
+    if (!title && !content) {
+      alert("Note is empty!");
+      return;
+    }
+
+    // Turn to Dict
+    const note_details = {
+      id: id,
+      title: title,
+      content: content
+    }
+
+    const response = await fetch("/save_note", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(note_details)
+    });
+    const data = await response.json();
+    
+    // Update currently selected note
+    current_note_id = data.id;
+
+    // Update Note list
+    updateNoteList(current_note_id, data.title);
+    setActiveNote(current_note_id);
+
+    // Update Delete Button
+    updateDelBtn();
+
+    // Update the last updated time
+    note_last_updated_element.textContent = data.updated_at;
+  });
+
+
+  // *** THIS IS FOR Button - Delete
+  note_delete_element.addEventListener("click", async () => {
+    try {
+      fetch(`/del_note?id=${current_note_id}`);
+
+      // We ain't giving it title, so this defaults to "null"
+      updateNoteList(current_note_id);
+
+      // Clear Note title and Content
+      reset_note();
+
+      // To Highlight "Create new note" button
+      current_note_id = null;
+      setActiveNote(current_note_id);
+
+      // Update save and delete button
+      updateSaveBtn();
+      updateDelBtn();
+    }
+    catch (e) {
+      alert("Error! Details: " + e);
+    }
+  });
+
+});

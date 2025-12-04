@@ -1,13 +1,16 @@
 {% extends "layout.html" %}
 
+{% block auth_css %}
+    <link href="/static/css/auth.css" rel="stylesheet">
+{% endblock %}
+
 {% block title %}
     Login
 {% endblock %}
 
-
 {% block body %}
     <div class="d-flex justify-content-center align-items-center">
-        <form class="card" action="/login" method="post">
+        <form class="transparent-box card text-light" action="/login" method="post">
             <h2 class="text-center card-header">LOGIN</h2>
 
             <div class="card-body p-4">
