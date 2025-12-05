@@ -168,5 +168,5 @@ What I wanted to do is to make the web page updates dynamically. For example, re
 
 ## Acknowledgements:
 <p align="justify">
-I also thank the CS50 staff for their lectures and materials, which helped guide me through this project. I used references from the Flask documentation and w3schools while learning Bootstrap. This project was created as part of CS50.
+I also thank the CS50 staff for their lectures and materials, which helped guide me through this project. Here is the <a href="https://cs50.harvard.edu/x/">Link to CS50x</a>. I would also like to thank the Flask, Bootstrap and W3Schools communities for their documentation and resources, which helped in building this project. This work was completed as part of the CS50x course.
 </p>
