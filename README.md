@@ -162,11 +162,11 @@ To build the frontend, I had decided to go with <b>Bootstrap</b>. But since, I w
 <br>
 After that, I was able to build a basic and clean layout for <b>NoteBox</b>. However, it still didn’t have any dynamic behavior. So, I had to turn to <b>JavaScript</b>, which was also quite unfamiliar to me. 
 <br>
-What I wanted to do is to make the web page updates dynamically. For example, refreshing the whole page every time a user edits a note would be annoying. Editing a note multiple times would mean multiple refreshes, which is not practical. After reviewing JavaScript examples from CS50, I was able to get the dynamic updates working. (There may still be areas to improve.)
+What I wanted to do is to make the web page updates dynamically. For example, refreshing the whole page every time a user edits a note would be annoying. Editing a note multiple times would mean multiple refreshes, which is not practical. After some research, I was able to get the dynamic updates working. (There may still be areas to improve.)
 </p>
 
 
 ## Acknowledgements:
 <p align="justify">
-I also thank the CS50 staff for their lectures and materials, which helped guide me through this project. Here is the <a href="https://cs50.harvard.edu/x/">Link to CS50x</a>. I would also like to thank the Flask, Bootstrap and W3Schools communities for their documentation and resources, which helped in building this project. This work was completed as part of the CS50x course.
+I would also thank the CS50, Flask, Bootstrap and W3Schools communities for their documentation and resources, which helped in building this project.
 </p>
